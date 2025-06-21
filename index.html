@@ -616,10 +616,16 @@
             <div class="video-section">
                 <h3 class="section-title">🏥 医局の様子</h3>
                 <div class="video-placeholder">
-                    <video controls style="width: 100%; height: 350px; border-radius: 12px; object-fit: contain; background: #f8f9fa; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                        <source src="/video/residentroom.mp4" type="video/mp4">
+                    <video controls style="width: 100%; height: 350px; border-radius: 12px; object-fit: contain; background: #f8f9fa; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <source src="video/residentroom.mp4" type="video/mp4">
+                        <source src="./video/residentroom.mp4" type="video/mp4">
                         医局の様子動画を再生できません。
                     </video>
+                    <div style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 350px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; color: #667eea;">
+                        <div style="font-size: 4em; margin-bottom: 15px;">🎬</div>
+                        <div style="font-size: 1.2em; font-weight: bold; text-align: center;">医局の様子動画</div>
+                        <div style="font-size: 1em; color: #666; text-align: center; margin-top: 10px;">動画ファイルを準備中です</div>
+                    </div>
                 </div>
                 <div class="video-title">研修医の日常 - 医局での一日</div>
                 <div class="video-description">
@@ -632,12 +638,17 @@
                 <div class="interview-grid">
                     <div class="interview-card">
                         <div class="interview-video">
-                            <video controls 
-                            poster="/image/yasuda.jpg" preload="metadata"
-                            style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain;">
-                                <source src="/video/yasuda.mp4" type="video/mp4">
+                            <video controls style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain;" 
+                                   poster="image/yasuda.jpg" preload="metadata"
+                                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <source src="video/yasuda.mp4" type="video/mp4">
+                                <source src="./video/yasuda.mp4" type="video/mp4">
                                 安田先生のインタビュー動画を再生できません。
                             </video>
+                            <div style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 200px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; color: #667eea;">
+                                <div style="font-size: 3em; margin-bottom: 10px;">🎤</div>
+                                <div style="font-size: 1em; font-weight: bold;">安田先生インタビュー</div>
+                            </div>
                         </div>
                         <div class="video-title">安田先生（初期研修医1年目）</div>
                         <div class="video-description">
@@ -647,10 +658,17 @@
                     
                     <div class="interview-card">
                         <div class="interview-video">
-                            <video controls style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain;" poster="/image/takahashi.jpg">
-                                <source src="/video/takahashi.mp4" type="video/mp4">
+                            <video controls style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain;" 
+                                   poster="image/takahashi.jpg"
+                                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <source src="video/takahashi.mp4" type="video/mp4">
+                                <source src="./video/takahashi.mp4" type="video/mp4">
                                 高橋先生のインタビュー動画を再生できません。
                             </video>
+                            <div style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 200px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; color: #667eea;">
+                                <div style="font-size: 3em; margin-bottom: 10px;">🎤</div>
+                                <div style="font-size: 1em; font-weight: bold;">高橋先生インタビュー</div>
+                            </div>
                         </div>
                         <div class="video-title">高橋先生（初期研修医1年目）</div>
                         <div class="video-description">
@@ -660,10 +678,17 @@
                     
                     <div class="interview-card">
                         <div class="interview-video">
-                            <video controls style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain;" poster="/image/odahara.jpg">
-                                <source src="/video/odahara.mp4" type="video/mp4">
+                            <video controls style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain;" 
+                                   poster="image/odahara.jpg"
+                                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <source src="video/odahara.mp4" type="video/mp4">
+                                <source src="./video/odahara.mp4" type="video/mp4">
                                 小田原先生のインタビュー動画を再生できません。
                             </video>
+                            <div style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 200px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; color: #667eea;">
+                                <div style="font-size: 3em; margin-bottom: 10px;">🎤</div>
+                                <div style="font-size: 1em; font-weight: bold;">小田原先生インタビュー</div>
+                            </div>
                         </div>
                         <div class="video-title">小田原先生（初期研修医2年目）</div>
                         <div class="video-description">
@@ -688,23 +713,48 @@
                     <div class="photo-grid-top" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 25px; max-width: 1200px; margin-left: auto; margin-right: auto;">
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident1.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident1.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👩‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident2.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident2.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👨‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident3.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident3.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👩‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident4.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident4.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👨‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident5.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident5.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👩‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -712,14 +762,50 @@
                     <div class="photo-grid-bottom" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; max-width: 1200px; margin-left: auto; margin-right: auto;">
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident6.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident6.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👨‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
-                            <img src="/image/resident7.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
+                            <img src="image/resident7.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👩‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
                         </div>
                         
                         <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+                            <img src="image/resident8.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👨‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
+                        </div>
+                        
+                        <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+                            <img src="image/resident9.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👩‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
+                        </div>
+                        
+                        <div class="resident-card" style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
+                            <img src="image/resident10.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: cover; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 180px; background: rgba(255,255,255,0.2); border-radius: 10px; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <div style="font-size: 2.5em; margin-bottom: 8px;">👨‍⚕️</div>
+                                <div style="font-size: 0.9em; text-align: center;">研修医の先生</div>
+                            </div>
+                        </div>
+                    </div>="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
                             <img src="/image/resident8.jpg" alt="研修医の先生" style="width: 100%; height: 180px; object-fit: contain; background-color: rgba(255,255,255,0.1); border-radius: 10px; transition: transform 0.3s ease;">
                         </div>
                         
