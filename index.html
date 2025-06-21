@@ -828,15 +828,16 @@
             
             console.log('フォームデータ:', formData);
             
-            // データを保存（実際の環境ではサーバーに送信）
-            console.log('送信されたデータ:', {
-                名前: formData.name,
-                メール: formData.email,
-                大学: formData.university,
-                学年: formData.grade,
-                希望研修科: selectedSpecialties,
-                メッセージ: formData.message
-            });
+            // データを記録（コンソールとローカルストレージに保存）
+            console.log('==== 研修医申込みデータ ====');
+            console.log('名前:', formData.name);
+            console.log('メールアドレス:', formData.email);
+            console.log('大学名:', formData.university);
+            console.log('学年:', formData.grade);
+            console.log('希望研修科:', selectedSpecialties);
+            console.log('メッセージ:', formData.message);
+            console.log('申込み日時:', new Date().toLocaleString('ja-JP'));
+            console.log('========================');
             
             // 少し遅延を入れて送信処理をシミュレート
             setTimeout(() => {
@@ -849,7 +850,7 @@
                 
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
-            }, 1000);
+            }, 800);
         });
         
         function showContent() {
