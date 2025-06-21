@@ -76,7 +76,7 @@
             color: #555;
         }
         
-        .form-group input, .form-group select {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 15px;
             border: 2px solid #e1e5e9;
@@ -86,7 +86,7 @@
             background: rgba(255, 255, 255, 0.8);
         }
         
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -348,6 +348,22 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
+        .resident-card:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+            background: rgba(255,255,255,0.25) !important;
+        }
+
+        .resident-card:hover img {
+            transform: scale(1.05) !important;
+        }
+        
+        @media (max-width: 1024px) {
+            .photo-grid-top, .photo-grid-bottom {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -368,6 +384,16 @@
             .photo-grid {
                 grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
+            
+            .photo-grid-top, .photo-grid-bottom {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .photo-grid-top, .photo-grid-bottom {
+                grid-template-columns: 1fr !important;
+            }
         }
     </style>
 </head>
@@ -384,35 +410,28 @@
                 以下の情報をご入力いただくと、当院の研修医に関する詳細コンテンツをご覧いただけます。
             </p>
             
-            <form name="hospital-application" method="POST" data-netlify="true" action="/#content-section" netlify-honeypot="bot-field" id="applicationForm" style="background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); max-width: 900px; margin: 0 auto;">
-                <!-- スパム対策の隠しフィールド -->
-                <p style="display: none;">
-                    <label>Don't fill this out if you're human: <input name="bot-field" /></label>
-                </p>
-                
-                <!-- 必須：フォーム名の隠しフィールド -->
-                <input type="hidden" name="form-name" value="hospital-application" />
-                
-                <div class="form-group" style="margin-bottom: 25px;">
-                    <label for="fullName" style="display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 16px;">名前 *</label>
-                    <input type="text" id="fullName" name="fullName" placeholder="例：田中 太郎" required style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.9);">
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label for="name">名前 <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" placeholder="例：田中 太郎" required>
+                    <div id="name-error" class="error-message">名前を入力してください</div>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 25px;">
-                    <label for="email" style="display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 16px;">メールアドレス *</label>
-                    <input type="email" id="email" name="email" required style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.9);">
+                <div class="form-group">
+                    <label for="email">メールアドレス <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="例：tanaka@example.com" required>
+                    <div id="email-error" class="error-message">正しいメールアドレスを入力してください</div>
                 </div>
                 
-                <!-- 大学名 -->
-                <div class="form-group" style="margin-bottom: 25px;">
-                    <label for="university" style="display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 16px;">大学名 *</label>
-                    <input type="text" id="university" name="university" placeholder="例：○○大学医学部" required style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.9);">
+                <div class="form-group">
+                    <label for="university">大学名 <span class="required">*</span></label>
+                    <input type="text" id="university" name="university" placeholder="例：○○大学医学部" required>
+                    <div id="university-error" class="error-message">大学名を入力してください</div>
                 </div>
                 
-                <!-- 学年 -->
-                <div class="form-group" style="margin-bottom: 25px;">
-                    <label for="grade" style="display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 16px;">学年 *</label>
-                    <select id="grade" name="grade" required style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.9);">
+                <div class="form-group">
+                    <label for="grade">学年 <span class="required">*</span></label>
+                    <select id="grade" name="grade" required>
                         <option value="">学年を選択してください</option>
                         <option value="医学部1年">医学部1年</option>
                         <option value="医学部2年">医学部2年</option>
@@ -425,202 +444,163 @@
                         <option value="専攻医">専攻医</option>
                         <option value="その他">その他</option>
                     </select>
+                    <div id="grade-error" class="error-message">学年を選択してください</div>
                 </div>
                 
-                <!-- 統一デザインの複数選択可能な研修科（細分化版） -->
-                <div class="form-group" style="margin-bottom: 25px;">
-                    <label style="display: block; margin-bottom: 15px; color: #333; font-weight: 600; font-size: 16px;">希望研修科 * (複数選択可)</label>
-                    
-                    <!-- 内科系の詳細選択 -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px; font-weight: 600;">🩺 内科系</h4>
-                        <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="循環器内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>循環器内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="呼吸器内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>呼吸器内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="消化器内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>消化器内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="肝臓内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>肝臓内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="腎臓内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>腎臓内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="糖尿病内分泌内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>糖尿病内分泌内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="脳神経内科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>脳神経内科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="膠原病科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>膠原病科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="感染症科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>感染症科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="総合診療科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>総合診療科</span>
-                            </label>
-                            
+                <div class="form-group">
+                    <label>希望研修科 <span class="required">*</span> (複数選択可)</label>
+                    <div class="specialty-categories">
+                        <div class="specialty-category">
+                            <div class="category-title">🩺 内科系</div>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="循環器内科">
+                                    <span>循環器内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="呼吸器内科">
+                                    <span>呼吸器内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="消化器内科">
+                                    <span>消化器内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="肝臓内科">
+                                    <span>肝臓内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="腎臓内科">
+                                    <span>腎臓内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="糖尿病内分泌内科">
+                                    <span>糖尿病内分泌内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="脳神経内科">
+                                    <span>脳神経内科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="膠原病科">
+                                    <span>膠原病科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="感染症科">
+                                    <span>感染症科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="総合診療科">
+                                    <span>総合診療科</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="specialty-category">
+                            <div class="category-title">🔪 外科系</div>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="一般外科">
+                                    <span>一般外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="食道外科">
+                                    <span>食道外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="胃外科">
+                                    <span>胃外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="大腸外科">
+                                    <span>大腸外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="肝胆膵外科">
+                                    <span>肝胆膵外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="呼吸器外科">
+                                    <span>呼吸器外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="乳腺外科">
+                                    <span>乳腺外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="整形外科">
+                                    <span>整形外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="脳神経外科">
+                                    <span>脳神経外科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="心臓血管外科">
+                                    <span>心臓血管外科</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="specialty-category">
+                            <div class="category-title">🏥 専門科</div>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="小児科">
+                                    <span>小児科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="産婦人科">
+                                    <span>産婦人科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="精神科">
+                                    <span>精神科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="救急科">
+                                    <span>救急科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="麻酔科">
+                                    <span>麻酔科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="放射線科">
+                                    <span>放射線科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="病理科">
+                                    <span>病理科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="眼科">
+                                    <span>眼科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="耳鼻咽喉科">
+                                    <span>耳鼻咽喉科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="皮膚科">
+                                    <span>皮膚科</span>
+                                </label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" name="specialty" value="泌尿器科">
+                                    <span>泌尿器科</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- 外科系（細分化版） -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px; font-weight: 600;">🔪 外科系</h4>
-                        <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="一般外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>一般外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="食道外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>食道外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="胃外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>胃外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="大腸外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>大腸外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="肝胆膵外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>肝胆膵外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="呼吸器外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>呼吸器外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="乳腺外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>乳腺外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="整形外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>整形外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="脳神経外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>脳神経外科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="心臓血管外科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>心臓血管外科</span>
-                            </label>
-                            
-                        </div>
-                    </div>
-                    
-                    <!-- 専門科 -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="color: #667eea; margin-bottom: 10px; font-size: 14px; font-weight: 600;">🏥 専門科</h4>
-                        <div class="checkbox-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="小児科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>小児科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="産婦人科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>産婦人科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="精神科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>精神科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="救急科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>救急科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="麻酔科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>麻酔科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="放射線科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>放射線科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="病理科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>病理科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="眼科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>眼科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="耳鼻咽喉科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>耳鼻咽喉科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="皮膚科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>皮膚科</span>
-                            </label>
-                            
-                            <label class="checkbox-item" style="display: flex; align-items: center; padding: 12px 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 10px; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; font-size: 13px;">
-                                <input type="checkbox" name="department" value="泌尿器科" style="margin-right: 8px; transform: scale(1.2); accent-color: #667eea;">
-                                <span>泌尿器科</span>
-                            </label>
-                            
-                        </div>
-                    </div>
-                    
-                    <small style="color: #666; margin-top: 10px; display: block; font-style: italic;">※ 複数の科を選択できます。興味のある科をすべて選択してください。</small>
+                    <div id="specialty-error" class="error-message">希望研修科を少なくとも1つ選択してください</div>
                 </div>
                 
-                <div class="form-group" style="margin-bottom: 30px;">
-                    <label for="message" style="display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 16px;">メッセージ・質問等</label>
-                    <textarea id="message" name="message" rows="4" placeholder="研修に関するご質問やご要望をお書きください" style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.9); resize: vertical;"></textarea>
+                <div class="form-group">
+                    <label for="message">メッセージ・質問等</label>
+                    <textarea id="message" name="message" rows="4" placeholder="研修に関するご質問やご要望をお書きください"></textarea>
                 </div>
                 
-                <button type="submit" class="submit-btn" style="width: 100%; padding: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3); text-transform: none;">
-                    📋 コンテンツを閲覧
-                </button>
+                <button type="submit" class="submit-btn">📋 コンテンツを閲覧</button>
             </form>
         </div>
         
@@ -634,18 +614,18 @@
             </div>
             
             <div class="video-section">
-    <h3 class="section-title">🏥 医局の様子</h3>
-    <div class="video-placeholder">
-        <video controls style="width: 100%; height: 350px; border-radius: 12px; object-fit: contain; background: #f8f9fa; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-            <source src="/video/residentroom.mp4" type="video/mp4">
-            医局の様子動画を再生できません。
-        </video>
-    </div>
-    <div class="video-title">研修医の日常 - 医局での一日</div>
-    <div class="video-description">
-        当院の研修医が実際に働く医局の様子をご紹介します。
-    </div>
-</div>
+                <h3 class="section-title">🏥 医局の様子</h3>
+                <div class="video-placeholder">
+                    <video controls style="width: 100%; height: 350px; border-radius: 12px; object-fit: contain; background: #f8f9fa; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <source src="/video/residentroom.mp4" type="video/mp4">
+                        医局の様子動画を再生できません。
+                    </video>
+                </div>
+                <div class="video-title">研修医の日常 - 医局での一日</div>
+                <div class="video-description">
+                    当院の研修医が実際に働く医局の様子をご紹介します。
+                </div>
+            </div>
             
             <div class="video-section">
                 <h3 class="section-title">🎤 研修医インタビュー</h3>
@@ -660,7 +640,7 @@
                             </video>
                         </div>
                         <div class="video-title">安田先生（初期研修医1年目）</div>
-                        <div  class="video-description">
+                        <div class="video-description">
                             「基礎研究と感染症への興味を活かした駒込病院での学びと成長」
                         </div>
                     </div>
@@ -693,7 +673,7 @@
                 </div>
             </div>
             
-    <div class="photos-section" style="margin: 50px 0; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; position: relative; overflow: hidden;">
+            <div class="photos-section" style="margin: 50px 0; padding: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; position: relative; overflow: hidden;">
                 <!-- 背景デコレーション -->
                 <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 1;"></div>
                 <div style="position: absolute; bottom: -30px; left: -30px; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; z-index: 1;"></div>
@@ -769,7 +749,7 @@
     </div>
     
     <script>
-        document.getElementById('studentForm').addEventListener('submit', async function(e) {
+        document.getElementById('applicationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             console.log('フォーム送信開始');
@@ -778,7 +758,7 @@
             const submitBtn = document.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
             submitBtn.disabled = true;
-            submitBtn.textContent = '送信中...';
+            submitBtn.textContent = '📤 送信中...';
             
             // バリデーション
             let isValid = true;
@@ -842,40 +822,34 @@
                 university: document.getElementById('university').value,
                 grade: document.getElementById('grade').value,
                 email: document.getElementById('email').value,
-                specialty: selectedSpecialties
+                specialty: selectedSpecialties,
+                message: document.getElementById('message').value
             };
             
             console.log('フォームデータ:', formData);
             
-            try {
-                // サーバーにデータを送信
-                const response = await fetch('/api/submit-application', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
+            // データを保存（実際の環境ではサーバーに送信）
+            console.log('送信されたデータ:', {
+                名前: formData.name,
+                メール: formData.email,
+                大学: formData.university,
+                学年: formData.grade,
+                希望研修科: selectedSpecialties,
+                メッセージ: formData.message
+            });
+            
+            // 少し遅延を入れて送信処理をシミュレート
+            setTimeout(() => {
+                // 成功メッセージを表示
+                alert('申込みが完了しました。コンテンツをご覧ください。');
                 
-                const result = await response.json();
+                // グローバル変数にデータを保存（コンテンツ表示用）
+                window.formData = formData;
+                showContent();
                 
-                if (result.success) {
-                    console.log('送信成功:', result);
-                    // グローバル変数にデータを保存（コンテンツ表示用）
-                    window.formData = formData;
-                    showContent();
-                } else {
-                    console.error('送信エラー:', result.message);
-                    alert('申込みの送信に失敗しました: ' + result.message);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
-                }
-            } catch (error) {
-                console.error('通信エラー:', error);
-                alert('申込みの送信に失敗しました。ネットワーク接続を確認してください。');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
-            }
+            }, 1000);
         });
         
         function showContent() {
@@ -886,24 +860,33 @@
             const welcomeName = document.getElementById('welcome-name');
             
             if (formContainer && contentSection && welcomeName) {
+                // フォームセクション全体を非表示
                 formContainer.style.display = 'none';
+                
+                // コンテンツセクションを表示
                 contentSection.style.display = 'block';
                 welcomeName.textContent = window.formData.name;
                 
                 console.log('ページ切り替え完了:', window.formData.name);
                 
-                // ページトップにスクロール
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+                // コンテンツセクションにスムーズスクロール
+                contentSection.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
                 });
+                
+                // コンテンツセクションを強調表示
+                contentSection.style.boxShadow = '0 0 30px rgba(102, 126, 234, 0.5)';
+                setTimeout(() => {
+                    contentSection.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+                }, 2000);
             } else {
                 console.error('必要な要素が見つかりません');
             }
         }
         
         // フォームの入力時にエラーメッセージを非表示にする
-        document.querySelectorAll('input[type="text"], input[type="email"], select').forEach(input => {
+        document.querySelectorAll('input[type="text"], input[type="email"], select, textarea').forEach(input => {
             input.addEventListener('input', function() {
                 const errorDiv = document.getElementById(this.id + '-error');
                 if (errorDiv) {
@@ -924,34 +907,5 @@
             });
         });
     </script>
-    <style>
-.resident-card:hover {
-    transform: translateY(-5px) !important;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
-    background: rgba(255,255,255,0.25) !important;
-}
-
-.resident-card:hover img {
-    transform: scale(1.05) !important;
-}
-
-@media (max-width: 1024px) {
-    .photo-grid-top, .photo-grid-bottom {
-        grid-template-columns: repeat(3, 1fr) !important;
-    }
-}
-
-@media (max-width: 768px) {
-    .photo-grid-top, .photo-grid-bottom {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .photo-grid-top, .photo-grid-bottom {
-        grid-template-columns: 1fr !important;
-    }
-}
-</style>
 </body>
 </html>
