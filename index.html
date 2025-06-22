@@ -793,6 +793,45 @@
             </div>
         </div>
     </div>
+
+    <!-- データ管理パネル（管理者用・非表示） -->
+<div id="admin-panel" style="display: none; position: fixed; bottom: 20px; right: 20px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); z-index: 1000; min-width: 250px;">
+<div style="display: flex; align-items: center; margin-bottom: 10px;">
+<h4 style="color: #2c5aa0; margin: 0; font-size: 0.9em;">📊 申込みデータ管理</h4>
+<button onclick="toggleAdminPanel()" style="margin-left: auto; background: none; border: none; font-size: 1.2em; cursor: pointer;">✕</button>
+</div>
+
+<div id="data-count" style="color: #666; font-size: 0.8em; margin-bottom: 10px;">
+申込み件数: <span id="count-display">0</span>件
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<button onclick="downloadCSV()" style="background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8em; transition: all 0.3s ease;">
+📄 CSV形式でダウンロード
+</button>
+<button onclick="downloadJSON()" style="background: #17a2b8; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8em; transition: all 0.3s ease;">
+📋 JSON形式でダウンロード
+</button>
+<button onclick="viewApplications()" style="background: #6f42c1; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8em; transition: all 0.3s ease;">
+👁️ データ一覧表示
+</button>
+<button onclick="clearAllData()" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8em; transition: all 0.3s ease;">
+🗑️ 全データ削除
+</button>
+</div>
+</div>
+
+<!-- データ一覧表示モーダル -->
+<div id="data-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center;">
+<div style="background: white; border-radius: 15px; padding: 30px; max-width: 90%; max-height: 80%; overflow-y: auto; position: relative;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<h3 style="color: #2c5aa0; margin: 0;">📊 申込みデータ一覧</h3>
+<button onclick="closeModal()" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">✕</button>
+</div>
+<div id="data-content" style="overflow-x: auto;"></div>
+</div>
+</div>
+</div>
     
     <script>
         document.getElementById('applicationForm').addEventListener('submit', function(e) {
