@@ -1635,6 +1635,160 @@ function showFallback(iframe) {
         '</div>';
 }
 
+// ブラウザコンソールに直接貼り付けて実行
+
+// JSONP送信関数を定義
+async function sendToGoogleSheetsJSONP(formData) {
+    return new Promise((resolve) => {
+        try {
+            console.log('🔄 JSONP方式でGoogle Sheetsに送信中...');
+            console.log('📋 送信データ:', formData);
+            
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbzBTW2INCuzbEcqpc9whSbXszlnytITkUkVZAigUxG-M2KB006qZSwekjHZ-pnbuJYx/exec';
+            const secretKey = 'komagome2025secret';
+            
+            const payload = {
+                secretKey: secretKey,
+                data: {
+                    id: formData.id,
+                    submittedAt: formData.submittedAt,
+                    name: formData.name,
+                    email: formData.email,
+                    university: formData.university,
+                    grade: formData.grade,
+                    specialty: Array.isArray(formData.specialty) ? formData.specialty.join(', ') : formData.specialty,
+                    message: formData.message || ''
+                }
+            };
+            
+            const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            console.log('📞 コールバック名:', callbackName);
+            
+            window[callbackName] = function(response) {
+                console.log('📄 JSONP レスポンス受信:', response);
+                
+                try {
+                    delete window[callbackName];
+                    if (script && script.parentNode) {
+                        document.head.removeChild(script);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ クリーンアップエラー:', e);
+                }
+                
+                if (response && response.success) {
+                    console.log('✅ JSONP送信成功');
+                    console.log('📊 保存行番号:', response.rowNumber || '不明');
+                    console.log('🕒 タイムスタンプ:', response.timestamp || '不明');
+                    resolve(true);
+                } else {
+                    console.error('❌ JSONP送信失敗:', response?.error || '不明なエラー');
+                    console.log('📄 完全なレスポンス:', response);
+                    resolve(false);
+                }
+            };
+            
+            setTimeout(() => {
+                console.error('❌ JSONP タイムアウト（10秒）');
+                try {
+                    delete window[callbackName];
+                    if (script && script.parentNode) {
+                        document.head.removeChild(script);
+                    }
+                } catch (e) {}
+                resolve(false);
+            }, 10000);
+            
+            const dataParam = JSON.stringify(payload);
+            const url = webAppUrl + '?callback=' + encodeURIComponent(callbackName) + '&data=' + encodeURIComponent(dataParam);
+            
+            console.log('🔗 URL長:', url.length);
+            console.log('🔗 リクエストURL（先頭200文字）:', url.substring(0, 200) + '...');
+            
+            const script = document.createElement('script');
+            script.src = url;
+            script.async = true;
+            
+            script.onerror = function(error) {
+                console.error('❌ スクリプト読み込みエラー:', error);
+                try {
+                    delete window[callbackName];
+                } catch (e) {}
+                resolve(false);
+            };
+            
+            script.onload = function() {
+                console.log('📦 JSONP スクリプト読み込み完了');
+            };
+            
+            document.head.appendChild(script);
+            console.log('📤 JSONP リクエスト送信完了');
+            
+        } catch (error) {
+            console.error('❌ JSONP送信準備エラー:', error);
+            resolve(false);
+        }
+    });
+}
+
+// テスト関数を定義
+function testJSONPInBrowser() {
+    console.log('🧪 ブラウザJSONPテスト開始');
+    
+    const testData = {
+        id: Date.now(),
+        submittedAt: new Date().toLocaleString('ja-JP'),
+        name: 'ブラウザJSONPテスト',
+        email: 'browser-test@example.com',
+        university: 'ブラウザテスト大学',
+        grade: '医学部6年',
+        specialty: ['内科', '外科'],
+        message: 'ブラウザからのJSONPテスト'
+    };
+    
+    console.log('🔬 テストデータ:', testData);
+    
+    sendToGoogleSheetsJSONP(testData).then(success => {
+        if (success) {
+            console.log('🎉 ブラウザJSONPテスト成功!');
+            console.log('💡 Google Sheetsでデータを確認してください');
+        } else {
+            console.log('❌ ブラウザJSONPテスト失敗');
+        }
+    }).catch(error => {
+        console.error('❌ テスト実行エラー:', error);
+    });
+}
+
+// 簡単なテスト関数
+function simpleJSONPTest() {
+    console.log('🔧 簡単JSONPテスト開始');
+    
+    const callback = 'testCallback_' + Date.now();
+    
+    window[callback] = function(response) {
+        console.log('📄 簡単テスト結果:', response);
+        delete window[callback];
+        
+        if (response && response.message) {
+            console.log('✅ WebApp接続成功');
+        }
+    };
+    
+    const script = document.createElement('script');
+    script.src = 'https://script.google.com/macros/s/AKfycbzBTW2INCuzbEcqpc9whSbXszlnytITkUkVZAigUxG-M2KB006qZSwekjHZ-pnbuJYx/exec?callback=' + callback + '&data=' + encodeURIComponent('{"test":"simple"}');
+    
+    document.head.appendChild(script);
+    console.log('🚀 簡単テスト送信完了');
+}
+
+console.log('✅ JSONP関数定義完了');
+console.log('利用可能な関数:');
+console.log('- testJSONPInBrowser() : 完全なJSONPテスト');
+console.log('- simpleJSONPTest() : 簡単な接続テスト');
+console.log('');
+console.log('最初に simpleJSONPTest() を実行することをお勧めします');    
+
 </script>
 </body>
 </html>
