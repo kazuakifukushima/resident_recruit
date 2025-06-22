@@ -880,7 +880,7 @@ const WEBAPP_CONFIG = {
     secretKey: 'komagome2025secret'
 };
 
-// Google Apps Script経由でスプレッドシートに送信（修正版）
+// 改善版 Google Apps Script経由でスプレッドシートに送信
 async function sendToGoogleSheets(formData) {
     // プレースホルダーURLのチェック（実際のURLは除外）
     if (WEBAPP_CONFIG.webAppUrl.includes('YOUR_ACTUAL_WEBAPP_URL_HERE') || 
@@ -916,13 +916,16 @@ async function sendToGoogleSheets(formData) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            mode: 'cors', // CORS明示的に指定
+            credentials: 'omit' // 認証情報は送信しない
         });
 
         console.log('📨 レスポンス:', {
             status: response.status,
             statusText: response.statusText,
-            ok: response.ok
+            ok: response.ok,
+            headers: Array.from(response.headers.entries())
         });
 
         if (response.ok) {
@@ -932,13 +935,20 @@ async function sendToGoogleSheets(formData) {
             if (result.success) {
                 console.log('✅ Google Sheetsへのデータ送信成功');
                 console.log('📊 スプレッドシート行数:', result.rowNumber || '不明');
+                console.log('🕒 タイムスタンプ:', result.timestamp || '不明');
                 return true;
             } else {
+                console.error('❌ サーバーエラー:', result.error);
                 throw new Error(result.error || 'WebApp応答エラー');
             }
         } else {
             // エラーレスポンスの詳細を取得
-            const errorText = await response.text();
+            let errorText = '';
+            try {
+                errorText = await response.text();
+            } catch (e) {
+                errorText = '応答読み取り不可';
+            }
             console.error('❌ HTTPエラー:', response.status, response.statusText);
             console.error('🔍 エラー詳細:', errorText);
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -946,6 +956,14 @@ async function sendToGoogleSheets(formData) {
         
     } catch (error) {
         console.error('❌ Google Sheets送信失敗:', error);
+        
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            console.log('🚨 CORS または ネットワークエラー:');
+            console.log('- Google Apps ScriptでCORSヘッダーが設定されているか確認');
+            console.log('- WebAppが正しくデプロイされているか確認');
+            console.log('- ネットワーク接続を確認');
+        }
+        
         console.log('💡 ローカルデータは保存されています');
         console.log('🔧 トラブルシューティング:');
         console.log('- Google Apps Scriptが正しくデプロイされているか確認');
@@ -954,7 +972,7 @@ async function sendToGoogleSheets(formData) {
         console.log('- ネットワーク接続を確認');
         return false;
     }
-}    
+}  
    
 // データ蓄積用のグローバル変数
 let applicationData = [];
