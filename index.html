@@ -880,99 +880,194 @@ const WEBAPP_CONFIG = {
     secretKey: 'komagome2025secret'
 };
 
-// 改善版 Google Apps Script経由でスプレッドシートに送信
+// HTMLファイル内の既存のsendToGoogleSheets関数を以下で完全に置き換え
+
+// JSONP完全実装版 sendToGoogleSheets関数
 async function sendToGoogleSheets(formData) {
-    // プレースホルダーURLのチェック（実際のURLは除外）
-    if (WEBAPP_CONFIG.webAppUrl.includes('YOUR_ACTUAL_WEBAPP_URL_HERE') || 
-        WEBAPP_CONFIG.webAppUrl === 'https://script.google.com/macros/s/PLACEHOLDER/exec') {
-        console.warn('⚠️ Google Apps Script WebApp URLが設定されていません');
-        console.log('設定方法: WEBAPP_CONFIG.webAppUrl に実際のURLを設定してください');
-        return false;
-    }
-    
-    try {
-        console.log('📤 Google Sheetsにデータ送信中...');
-        console.log('🔗 WebApp URL:', WEBAPP_CONFIG.webAppUrl);
-        console.log('📋 送信データ:', formData);
-        
-        const payload = {
-            secretKey: WEBAPP_CONFIG.secretKey,
-            data: {
-                id: formData.id,
-                submittedAt: formData.submittedAt,
-                name: formData.name,
-                email: formData.email,
-                university: formData.university,
-                grade: formData.grade,
-                specialty: formData.specialty.join(', '),
-                message: formData.message || ''
-            }
-        };
-        
-        console.log('📦 送信ペイロード:', payload);
-        
-        const response = await fetch(WEBAPP_CONFIG.webAppUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-            mode: 'cors', // CORS明示的に指定
-            credentials: 'omit' // 認証情報は送信しない
-        });
-
-        console.log('📨 レスポンス:', {
-            status: response.status,
-            statusText: response.statusText,
-            ok: response.ok,
-            headers: Array.from(response.headers.entries())
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            console.log('📄 レスポンス内容:', result);
+    return new Promise((resolve) => {
+        try {
+            console.log('📤 JSONP完全実装版でGoogle Sheetsに送信中...');
+            console.log('📋 送信データ:', formData);
             
-            if (result.success) {
-                console.log('✅ Google Sheetsへのデータ送信成功');
-                console.log('📊 スプレッドシート行数:', result.rowNumber || '不明');
-                console.log('🕒 タイムスタンプ:', result.timestamp || '不明');
-                return true;
-            } else {
-                console.error('❌ サーバーエラー:', result.error);
-                throw new Error(result.error || 'WebApp応答エラー');
+            // WebApp URL
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbzkiGXHkIKHHjVW_VpX48EFt8fUJ-c4y2Dt996tlSTJtx1Zyq9s7oV-sowKzd7z-oJz/exec';
+            const secretKey = 'komagome2025secret';
+            
+            // ペイロード準備
+            const payload = {
+                secretKey: secretKey,
+                data: {
+                    id: formData.id,
+                    submittedAt: formData.submittedAt,
+                    name: formData.name,
+                    email: formData.email,
+                    university: formData.university,
+                    grade: formData.grade,
+                    specialty: Array.isArray(formData.specialty) ? formData.specialty.join(', ') : formData.specialty,
+                    message: formData.message || ''
+                }
+            };
+            
+            console.log('📦 ペイロード準備完了:', payload);
+            
+            // ユニークなコールバック名を生成
+            const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            console.log('📞 コールバック名:', callbackName);
+            
+            // グローバルコールバック関数を作成
+            window[callbackName] = function(response) {
+                console.log('📄 JSONP レスポンス受信:', response);
+                
+                // タイムアウトをクリア
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
+                
+                // クリーンアップ
+                try {
+                    delete window[callbackName];
+                    if (script && script.parentNode) {
+                        document.head.removeChild(script);
+                    }
+                } catch (cleanupError) {
+                    console.warn('⚠️ クリーンアップエラー:', cleanupError);
+                }
+                
+                // レスポンス処理
+                if (response && response.success) {
+                    console.log('✅ JSONP送信成功!');
+                    console.log('📊 保存行番号:', response.rowNumber || '不明');
+                    console.log('🕒 保存時刻:', response.timestamp || '不明');
+                    console.log('📝 メッセージ:', response.message || '不明');
+                    console.log('🔄 送信方式:', response.method || 'JSONP');
+                    resolve(true);
+                } else {
+                    console.error('❌ JSONP送信失敗');
+                    console.log('📄 エラー詳細:', response?.error || '不明なエラー');
+                    console.log('📋 完全レスポンス:', response);
+                    resolve(false);
+                }
+            };
+            
+            // タイムアウト設定（15秒）
+            const timeoutId = setTimeout(() => {
+                console.error('❌ JSONP送信タイムアウト（15秒）');
+                
+                try {
+                    delete window[callbackName];
+                    if (script && script.parentNode) {
+                        document.head.removeChild(script);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ タイムアウト時クリーンアップエラー:', e);
+                }
+                
+                console.log('💡 タイムアウト後の対処:');
+                console.log('1. Google Apps Scriptが正しくデプロイされているか確認');
+                console.log('2. アクセス権限が「全員」になっているか確認');
+                console.log('3. スプレッドシートIDが正しく設定されているか確認');
+                
+                resolve(false);
+            }, 15000);
+            
+            // URLパラメータを構築
+            const dataParam = JSON.stringify(payload);
+            const baseUrl = webAppUrl + '?callback=' + encodeURIComponent(callbackName);
+            const dataUrlParam = '&data=' + encodeURIComponent(dataParam);
+            const finalUrl = baseUrl + dataUrlParam;
+            
+            console.log('🔗 リクエストURL長:', finalUrl.length);
+            console.log('🔗 URL概要:', baseUrl + '&data=...');
+            
+            // URLが長すぎる場合の警告
+            if (finalUrl.length > 2000) {
+                console.warn('⚠️ URL長が2000文字を超えています:', finalUrl.length);
+                console.log('💡 データを短縮することを検討してください');
             }
+            
+            // スクリプト要素を作成
+            const script = document.createElement('script');
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            
+            // スクリプトイベントハンドラ
+            script.onload = function() {
+                console.log('📦 JSONP スクリプト読み込み完了');
+            };
+            
+            script.onerror = function(error) {
+                console.error('❌ JSONP スクリプト読み込みエラー:', error);
+                
+                // タイムアウトをクリア
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
+                
+                // クリーンアップ
+                try {
+                    delete window[callbackName];
+                } catch (e) {
+                    console.warn('⚠️ エラー時クリーンアップエラー:', e);
+                }
+                
+                console.log('🔍 スクリプトエラー対処法:');
+                console.log('1. Google Apps ScriptのWebApp URLが正しいか確認');
+                console.log('2. Google Apps Scriptが最新版でデプロイされているか確認');
+                console.log('3. アクセス権限が「全員」に設定されているか確認');
+                console.log('4. ブラウザのセキュリティ設定を確認');
+                
+                resolve(false);
+            };
+            
+            // URLを設定してスクリプトを追加
+            script.src = finalUrl;
+            document.head.appendChild(script);
+            
+            console.log('📤 JSONP リクエスト送信完了');
+            console.log('⏳ レスポンス待機中...');
+            
+        } catch (error) {
+            console.error('❌ JSONP送信準備エラー:', error);
+            console.error('🔍 エラースタック:', error.stack);
+            resolve(false);
+        }
+    });
+}
+
+// デバッグ用テスト関数
+function testJSONPDirect() {
+    console.log('🧪 直接JSONPテスト開始');
+    
+    const testData = {
+        id: Date.now(),
+        submittedAt: new Date().toLocaleString('ja-JP'),
+        name: '直接JSONPテスト',
+        email: 'direct-jsonp@test.com',
+        university: '直接JSONP大学',
+        grade: '医学部6年',
+        specialty: ['内科'],
+        message: '直接JSONPテスト実行'
+    };
+    
+    console.log('🔬 テストデータ:', testData);
+    
+    sendToGoogleSheets(testData).then(success => {
+        if (success) {
+            console.log('🎉 直接JSONPテスト成功!');
+            console.log('💡 これで実際のフォーム送信も動作するはずです');
         } else {
-            // エラーレスポンスの詳細を取得
-            let errorText = '';
-            try {
-                errorText = await response.text();
-            } catch (e) {
-                errorText = '応答読み取り不可';
-            }
-            console.error('❌ HTTPエラー:', response.status, response.statusText);
-            console.error('🔍 エラー詳細:', errorText);
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            console.log('❌ 直接JSONPテスト失敗');
+            console.log('🔧 Google Apps Scriptの設定を確認してください');
         }
-        
-    } catch (error) {
-        console.error('❌ Google Sheets送信失敗:', error);
-        
-        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-            console.log('🚨 CORS または ネットワークエラー:');
-            console.log('- Google Apps ScriptでCORSヘッダーが設定されているか確認');
-            console.log('- WebAppが正しくデプロイされているか確認');
-            console.log('- ネットワーク接続を確認');
-        }
-        
-        console.log('💡 ローカルデータは保存されています');
-        console.log('🔧 トラブルシューティング:');
-        console.log('- Google Apps Scriptが正しくデプロイされているか確認');
-        console.log('- スプレッドシートIDが正しく設定されているか確認');
-        console.log('- スプレッドシートのアクセス権限を確認');
-        console.log('- ネットワーク接続を確認');
-        return false;
-    }
-}  
+    }).catch(error => {
+        console.error('❌ テスト実行エラー:', error);
+    });
+}
+
+// 使用方法ログ
+console.log('✅ JSONP完全実装版 sendToGoogleSheets 関数を定義しました');
+console.log('📝 テスト方法: testJSONPDirect() を実行');
+console.log('🎯 これで実際のフォーム送信でJSONPが使用されます');
    
 // データ蓄積用のグローバル変数
 let applicationData = [];
