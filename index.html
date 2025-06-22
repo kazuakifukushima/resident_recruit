@@ -955,49 +955,7 @@ async function sendToGoogleSheets(formData) {
         return false;
     }
 }    
-    try {
-        console.log('📤 Google Sheetsにデータ送信中...');
-        
-        const response = await fetch(WEBAPP_CONFIG.webAppUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                secretKey: WEBAPP_CONFIG.secretKey,
-                data: {
-                    id: formData.id,
-                    submittedAt: formData.submittedAt,
-                    name: formData.name,
-                    email: formData.email,
-                    university: formData.university,
-                    grade: formData.grade,
-                    specialty: formData.specialty.join(', '),
-                    message: formData.message || ''
-                }
-            })
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-                console.log('✅ Google Sheetsへのデータ送信成功');
-                console.log('📊 スプレッドシート行数:', result.rowNumber || '不明');
-                return true;
-            } else {
-                throw new Error(result.error || 'WebApp応答エラー');
-            }
-        } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-    } catch (error) {
-        console.error('❌ Google Sheets送信失敗:', error);
-        console.log('💡 ローカルデータは保存されています');
-        return false;
-    }
-}
-
+   
 // データ蓄積用のグローバル変数
 let applicationData = [];
 
