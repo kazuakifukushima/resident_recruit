@@ -1005,7 +1005,10 @@ function showContent() {
     }
 }
 
-// データ管理機能（隠し機能として保持）
+// データ管理機能（認証付きセキュア版）
+let adminAuthenticated = false;
+const ADMIN_PASSWORD = "komagome2025admin"; // 管理者パスワード
+
 function updateDataCount() {
     const countDisplay = document.getElementById('count-display');
     if (countDisplay) {
@@ -1013,29 +1016,136 @@ function updateDataCount() {
     }
 }
 
-// 管理者用データアクセス関数（コンソールから実行）
+// 管理者認証関数
+function authenticateAdmin(password) {
+    if (password === ADMIN_PASSWORD) {
+        adminAuthenticated = true;
+        console.log('✅ 管理者認証に成功しました。');
+        console.log('利用可能な管理コマンド:');
+        console.log('- showAdminPanel() : 管理パネル表示');
+        console.log('- getApplicationData() : データ一覧表示');
+        console.log('- exportCSVFromConsole() : CSVダウンロード');
+        console.log('- exportJSONFromConsole() : JSONダウンロード');
+        console.log('- logoutAdmin() : ログアウト');
+        return true;
+    } else {
+        console.error('❌ 認証に失敗しました。正しいパスワードを入力してください。');
+        return false;
+    }
+}
+
+// 管理者ログアウト
+function logoutAdmin() {
+    adminAuthenticated = false;
+    const panel = document.getElementById('admin-panel');
+    if (panel) {
+        panel.style.display = 'none';
+    }
+    console.log('🔒 管理者セッションからログアウトしました。');
+}
+
+// 認証チェック付き管理パネル表示
 function showAdminPanel() {
+    if (!adminAuthenticated) {
+        console.error('❌ アクセス拒否: 管理者認証が必要です。');
+        console.log('認証方法: authenticateAdmin("パスワード")');
+        return false;
+    }
+    
     const panel = document.getElementById('admin-panel');
     if (panel) {
         panel.style.display = 'block';
         updateDataCount();
-        console.log('管理パネルを表示しました。総データ件数:', applicationData.length);
+        console.log('✅ 管理パネルを表示しました。総データ件数:', applicationData.length);
     }
+    return true;
 }
 
-// コンソール用データ確認関数
+// 認証チェック付きデータ確認関数
 function getApplicationData() {
+    if (!adminAuthenticated) {
+        console.error('❌ アクセス拒否: 管理者認証が必要です。');
+        console.log('認証方法: authenticateAdmin("パスワード")');
+        return null;
+    }
+    
     console.log('=== 申込みデータ一覧 ===');
     console.log('総件数:', applicationData.length);
-    console.table(applicationData);
+    console.log('最終更新:', new Date().toLocaleString('ja-JP'));
+    
+    if (applicationData.length > 0) {
+        console.table(applicationData);
+        console.log('=== データ詳細 ===');
+        applicationData.forEach((data, index) => {
+            console.log(`【${index + 1}】`, {
+                '申込ID': data.id,
+                '申込日時': data.submittedAt,
+                '名前': data.name,
+                'メール': data.email,
+                '大学': data.university,
+                '学年': data.grade,
+                '希望科': data.specialty.join(', '),
+                'メッセージ': data.message || '(なし)'
+            });
+        });
+    } else {
+        console.log('申込みデータはありません。');
+    }
+    
     return applicationData;
 }
 
-// コンソール用CSV出力関数
+// 認証チェック付きCSV出力関数
 function exportCSVFromConsole() {
+    if (!adminAuthenticated) {
+        console.error('❌ アクセス拒否: 管理者認証が必要です。');
+        console.log('認証方法: authenticateAdmin("パスワード")');
+        return false;
+    }
+    
+    if (applicationData.length === 0) {
+        console.warn('⚠️ ダウンロードするデータがありません。');
+        return false;
+    }
+    
     downloadCSV();
-    console.log('CSVファイルをダウンロードしました。');
+    console.log('✅ CSVファイルをダウンロードしました。ファイル名: 研修医申込みデータ_' + new Date().toISOString().slice(0, 10) + '.csv');
+    return true;
 }
+
+// 認証チェック付きJSON出力関数
+function exportJSONFromConsole() {
+    if (!adminAuthenticated) {
+        console.error('❌ アクセス拒否: 管理者認証が必要です。');
+        console.log('認証方法: authenticateAdmin("パスワード")');
+        return false;
+    }
+    
+    if (applicationData.length === 0) {
+        console.warn('⚠️ ダウンロードするデータがありません。');
+        return false;
+    }
+    
+    downloadJSON();
+    console.log('✅ JSONファイルをダウンロードしました。ファイル名: 研修医申込みデータ_' + new Date().toISOString().slice(0, 10) + '.json');
+    return true;
+}
+
+// セキュリティ強化: 未認証時の警告
+function checkUnauthorizedAccess() {
+    if (!adminAuthenticated) {
+        console.warn('🔒 このサイトの申込みデータは保護されています。');
+        console.log('管理者の方は以下のコマンドで認証してください:');
+        console.log('authenticateAdmin("パスワード")');
+    }
+}
+
+// ページ読み込み時にセキュリティメッセージを表示
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        checkUnauthorizedAccess();
+    }, 2000);
+});
 
 function downloadCSV() {
     if (applicationData.length === 0) {
@@ -1138,17 +1248,31 @@ function closeModal() {
 }
 
 function clearAllData() {
+    if (!adminAuthenticated) {
+        console.error('❌ アクセス拒否: 管理者認証が必要です。');
+        return false;
+    }
+    
     if (confirm('すべての申込みデータを削除しますか？\nこの操作は取り消せません。')) {
         applicationData = [];
         sessionStorage.removeItem('hospitalApplications');
         updateDataCount();
+        console.log('✅ 全データを削除しました。');
         alert('全データを削除しました。');
+        return true;
     }
+    return false;
 }
 
 function toggleAdminPanel() {
+    if (!adminAuthenticated) {
+        console.error('❌ アクセス拒否: 管理者認証が必要です。');
+        return false;
+    }
+    
     const panel = document.getElementById('admin-panel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    return true;
 }
 
 // フォームの入力時にエラーメッセージを非表示にする
