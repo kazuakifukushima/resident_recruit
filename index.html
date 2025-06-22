@@ -872,23 +872,89 @@ async function generateJWTToken() {
     }
 }
 
-// より簡単で安全な方法：Google Apps Script Webアプリ経由
+// 修正版：Google Apps Script Webアプリ設定
 const WEBAPP_CONFIG = {
-    // Google Apps ScriptのWebアプリURLを設定
+    // 実際のGoogle Apps ScriptのWebアプリURL
     webAppUrl: 'https://script.google.com/macros/s/AKfycbzBTW2INCuzbEcqpc9whSbXszlnytITkUkVZAigUxG-M2KB006qZSwekjHZ-pnbuJYx/exec',
     // 認証用の秘密キー
     secretKey: 'komagome2025secret'
 };
 
-// Google Apps Script経由でスプレッドシートに送信（簡単版）
+// Google Apps Script経由でスプレッドシートに送信（修正版）
 async function sendToGoogleSheets(formData) {
-    // WebApp URLが設定されていない場合はスキップ
-    if (WEBAPP_CONFIG.webAppUrl.includes('AKfycbzBTW2INCuzbEcqpc9whSbXszlnytITkUkVZAigUxG-M2KB006qZSwekjHZ-pnbuJYx')) {
+    // プレースホルダーURLのチェック（実際のURLは除外）
+    if (WEBAPP_CONFIG.webAppUrl.includes('YOUR_ACTUAL_WEBAPP_URL_HERE') || 
+        WEBAPP_CONFIG.webAppUrl === 'https://script.google.com/macros/s/PLACEHOLDER/exec') {
         console.warn('⚠️ Google Apps Script WebApp URLが設定されていません');
         console.log('設定方法: WEBAPP_CONFIG.webAppUrl に実際のURLを設定してください');
         return false;
     }
     
+    try {
+        console.log('📤 Google Sheetsにデータ送信中...');
+        console.log('🔗 WebApp URL:', WEBAPP_CONFIG.webAppUrl);
+        console.log('📋 送信データ:', formData);
+        
+        const payload = {
+            secretKey: WEBAPP_CONFIG.secretKey,
+            data: {
+                id: formData.id,
+                submittedAt: formData.submittedAt,
+                name: formData.name,
+                email: formData.email,
+                university: formData.university,
+                grade: formData.grade,
+                specialty: formData.specialty.join(', '),
+                message: formData.message || ''
+            }
+        };
+        
+        console.log('📦 送信ペイロード:', payload);
+        
+        const response = await fetch(WEBAPP_CONFIG.webAppUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log('📨 レスポンス:', {
+            status: response.status,
+            statusText: response.statusText,
+            ok: response.ok
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('📄 レスポンス内容:', result);
+            
+            if (result.success) {
+                console.log('✅ Google Sheetsへのデータ送信成功');
+                console.log('📊 スプレッドシート行数:', result.rowNumber || '不明');
+                return true;
+            } else {
+                throw new Error(result.error || 'WebApp応答エラー');
+            }
+        } else {
+            // エラーレスポンスの詳細を取得
+            const errorText = await response.text();
+            console.error('❌ HTTPエラー:', response.status, response.statusText);
+            console.error('🔍 エラー詳細:', errorText);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Google Sheets送信失敗:', error);
+        console.log('💡 ローカルデータは保存されています');
+        console.log('🔧 トラブルシューティング:');
+        console.log('- Google Apps Scriptが正しくデプロイされているか確認');
+        console.log('- スプレッドシートIDが正しく設定されているか確認');
+        console.log('- スプレッドシートのアクセス権限を確認');
+        console.log('- ネットワーク接続を確認');
+        return false;
+    }
+}    
     try {
         console.log('📤 Google Sheetsにデータ送信中...');
         
