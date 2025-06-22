@@ -833,206 +833,379 @@
 </div>
 </div>
     
-    <script>
-        document.getElementById('applicationForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            console.log('フォーム送信開始');
-            
-            // ボタンを無効化して重複送信を防止
-            const submitBtn = document.querySelector('.submit-btn');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = '📤 送信中...';
-            
-            // バリデーション
-            let isValid = true;
-            const fields = ['name', 'university', 'grade', 'email'];
-            
-            // 通常のフィールドのバリデーション
-            fields.forEach(field => {
-                const input = document.getElementById(field);
-                const errorDiv = document.getElementById(field + '-error');
-                
-                if (!input.value.trim()) {
-                    errorDiv.style.display = 'block';
-                    input.style.borderColor = '#e74c3c';
-                    isValid = false;
-                } else {
-                    errorDiv.style.display = 'none';
-                    input.style.borderColor = '#e1e5e9';
-                }
-            });
-            
-            // 志望科のバリデーション（チェックボックス）
-            const specialtyCheckboxes = document.querySelectorAll('input[name="specialty"]:checked');
-            const specialtyError = document.getElementById('specialty-error');
-            
-            if (specialtyCheckboxes.length === 0) {
-                specialtyError.style.display = 'block';
-                isValid = false;
-            } else {
-                specialtyError.style.display = 'none';
-            }
-            
-            // メールアドレスの形式チェック
-            const email = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email.value && !emailRegex.test(email.value)) {
-                document.getElementById('email-error').style.display = 'block';
-                document.getElementById('email-error').textContent = '正しいメールアドレスを入力してください';
-                email.style.borderColor = '#e74c3c';
-                isValid = false;
-            }
-            
-            if (!isValid) {
-                // バリデーションエラーの場合はボタンを復旧
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-                
-                // エラーがある場合は最初のエラー要素にスクロール
-                const firstError = document.querySelector('.error-message[style*="block"]');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                return;
-            }
-            
-            // 選択された志望科を配列として取得
-            const selectedSpecialties = Array.from(specialtyCheckboxes).map(checkbox => checkbox.value);
-            
-            // フォームデータを準備
-            const formData = {
-                name: document.getElementById('name').value,
-                university: document.getElementById('university').value,
-                grade: document.getElementById('grade').value,
-                email: document.getElementById('email').value,
-                specialty: selectedSpecialties,
-                message: document.getElementById('message').value
-            };
-            
-            console.log('フォームデータ:', formData);
-            
-            // データを記録（コンソールとローカルストレージに保存）
-            console.log('==== 研修医申込みデータ ====');
-            console.log('名前:', formData.name);
-            console.log('メールアドレス:', formData.email);
-            console.log('大学名:', formData.university);
-            console.log('学年:', formData.grade);
-            console.log('希望研修科:', selectedSpecialties);
-            console.log('メッセージ:', formData.message);
-            console.log('申込み日時:', new Date().toLocaleString('ja-JP'));
-            console.log('========================');
-            
-            // 少し遅延を入れて送信処理をシミュレート
-            setTimeout(() => {
-                // 成功メッセージを表示
-                alert('申込みが完了しました。コンテンツをご覧ください。');
-                
-                // グローバル変数にデータを保存（コンテンツ表示用）
-                window.formData = formData;
-                showContent();
-                
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            }, 800);
-        });
-        
-        function showContent() {
-            console.log('showContent関数が呼ばれました');
-            
-            const formContainer = document.getElementById('registration-form');
-            const contentSection = document.getElementById('content-section');
-            const welcomeName = document.getElementById('welcome-name');
-            
-            if (formContainer && contentSection && welcomeName) {
-                // フォームセクション全体を非表示
-                formContainer.style.display = 'none';
-                
-                // コンテンツセクションを表示
-                contentSection.style.display = 'block';
-                welcomeName.textContent = window.formData.name;
-                
-                console.log('ページ切り替え完了:', window.formData.name);
-                
-                // コンテンツセクションにスムーズスクロール
-                contentSection.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-                
-                // コンテンツセクションを強調表示
-                contentSection.style.boxShadow = '0 0 30px rgba(102, 126, 234, 0.5)';
-                setTimeout(() => {
-                    contentSection.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
-                }, 2000);
-            } else {
-                console.error('必要な要素が見つかりません');
-            }
+<script>
+// データ蓄積用のグローバル変数
+let applicationData = [];
+
+// ページ読み込み時に保存されたデータを復元
+window.addEventListener('load', function() {
+    const savedData = sessionStorage.getItem('hospitalApplications');
+    if (savedData) {
+        try {
+            applicationData = JSON.parse(savedData);
+            updateDataCount();
+        } catch (e) {
+            console.error('保存されたデータの読み込みに失敗しました:', e);
+            applicationData = [];
         }
+    }
+});
+
+document.getElementById('applicationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    console.log('フォーム送信開始');
+    
+    // ボタンを無効化して重複送信を防止
+    const submitBtn = document.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '📤 送信中...';
+    
+    // バリデーション
+    let isValid = true;
+    const fields = ['name', 'university', 'grade', 'email'];
+    
+    // 通常のフィールドのバリデーション
+    fields.forEach(field => {
+        const input = document.getElementById(field);
+        const errorDiv = document.getElementById(field + '-error');
         
-        // フォームの入力時にエラーメッセージを非表示にする
-        document.querySelectorAll('input[type="text"], input[type="email"], select, textarea').forEach(input => {
-            input.addEventListener('input', function() {
-                const errorDiv = document.getElementById(this.id + '-error');
-                if (errorDiv) {
-                    errorDiv.style.display = 'none';
-                    this.style.borderColor = '#e1e5e9';
-                }
-            });
-        });
-        
-        // チェックボックスの変更時にエラーメッセージを非表示にする
-        document.querySelectorAll('input[name="specialty"]').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const specialtyError = document.getElementById('specialty-error');
-                const checkedBoxes = document.querySelectorAll('input[name="specialty"]:checked');
-                if (checkedBoxes.length > 0) {
-                    specialtyError.style.display = 'none';
-                }
-            });
-        });
-        
-        // YouTube iframe エラー検出とフォールバック
-        function handleYouTubeError() {
-            console.log('YouTube埋め込みエラーが検出されました');
-            
-            // すべてのYouTube iframeを検査
-            const iframes = document.querySelectorAll('iframe[src*="youtube"]');
-            
-            iframes.forEach((iframe, index) => {
-                iframe.addEventListener('error', function() {
-                    console.log(`iframe ${index + 1} でエラーが発生しました`);
-                    showFallback(iframe);
-                });
-                
-                // 読み込み完了をチェック
-                iframe.addEventListener('load', function() {
-                    console.log(`iframe ${index + 1} が正常に読み込まれました`);
-                });
-            });
+        if (!input.value.trim()) {
+            errorDiv.style.display = 'block';
+            input.style.borderColor = '#e74c3c';
+            isValid = false;
+        } else {
+            errorDiv.style.display = 'none';
+            input.style.borderColor = '#e1e5e9';
         }
+    });
+    
+    // 志望科のバリデーション（チェックボックス）
+    const specialtyCheckboxes = document.querySelectorAll('input[name="specialty"]:checked');
+    const specialtyError = document.getElementById('specialty-error');
+    
+    if (specialtyCheckboxes.length === 0) {
+        specialtyError.style.display = 'block';
+        isValid = false;
+    } else {
+        specialtyError.style.display = 'none';
+    }
+    
+    // メールアドレスの形式チェック
+    const email = document.getElementById('email');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email.value && !emailRegex.test(email.value)) {
+        document.getElementById('email-error').style.display = 'block';
+        document.getElementById('email-error').textContent = '正しいメールアドレスを入力してください';
+        email.style.borderColor = '#e74c3c';
+        isValid = false;
+    }
+    
+    if (!isValid) {
+        // バリデーションエラーの場合はボタンを復旧
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         
-        function showFallback(iframe) {
-            const container = iframe.parentElement;
-            const videoId = iframe.src.match(/embed\/([^?]+)/)?.[1] || 'unknown';
-            
-            container.innerHTML = `
-                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #667eea; cursor: pointer; border: 2px dashed #dee2e6;" onclick="window.open('https://www.youtube.com/watch?v=${videoId}', '_blank')">
-                    <div style="font-size: 3.5em; margin-bottom: 10px;">📺</div>
-                    <div style="font-size: 1em; font-weight: bold; margin-bottom: 5px;">動画を視聴</div>
-                    <div style="font-size: 0.8em; color: #666; display: flex; align-items: center;">
-                        <span style="margin-right: 5px;">▶️</span>
-                        YouTubeで開く
-                    </div>
-                </div>
-            `;
+        // エラーがある場合は最初のエラー要素にスクロール
+        const firstError = document.querySelector('.error-message[style*="block"]');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+        return;
+    }
+    
+    // 選択された志望科を配列として取得
+    const selectedSpecialties = Array.from(specialtyCheckboxes).map(checkbox => checkbox.value);
+    
+    // フォームデータを準備
+    const formData = {
+        id: Date.now(), // 一意のID
+        name: document.getElementById('name').value,
+        university: document.getElementById('university').value,
+        grade: document.getElementById('grade').value,
+        email: document.getElementById('email').value,
+        specialty: selectedSpecialties,
+        message: document.getElementById('message').value,
+        submittedAt: new Date().toLocaleString('ja-JP')
+    };
+    
+    console.log('フォームデータ:', formData);
+    
+    // データを配列に追加
+    applicationData.push(formData);
+    
+    // セッションストレージに保存（ブラウザを閉じるまで保持）
+    try {
+        sessionStorage.setItem('hospitalApplications', JSON.stringify(applicationData));
+    } catch (e) {
+        console.error('データの保存に失敗しました:', e);
+    }
+    
+    // データ件数を更新
+    updateDataCount();
+    
+    // データを記録（コンソールログ）
+    console.log('==== 研修医申込みデータ ====');
+    console.log('ID:', formData.id);
+    console.log('名前:', formData.name);
+    console.log('メールアドレス:', formData.email);
+    console.log('大学名:', formData.university);
+    console.log('学年:', formData.grade);
+    console.log('希望研修科:', selectedSpecialties);
+    console.log('メッセージ:', formData.message);
+    console.log('申込み日時:', formData.submittedAt);
+    console.log('総申込み件数:', applicationData.length);
+    console.log('========================');
+    
+    // 少し遅延を入れて送信処理をシミュレート
+    setTimeout(() => {
+        // バックグラウンドでのみデータ蓄積（ユーザーには見せない）
+        console.log('データが正常に蓄積されました。総件数:', applicationData.length);
         
-        // ページ読み込み完了後にエラー検出を開始
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(handleYouTubeError, 1000);
+        // グローバル変数にデータを保存（コンテンツ表示用）
+        window.formData = formData;
+        showContent();
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }, 800);
+});
+
+function showContent() {
+    console.log('showContent関数が呼ばれました');
+    
+    const formContainer = document.getElementById('registration-form');
+    const contentSection = document.getElementById('content-section');
+    const welcomeName = document.getElementById('welcome-name');
+    
+    if (formContainer && contentSection && welcomeName) {
+        // フォームセクション全体を非表示
+        formContainer.style.display = 'none';
+        
+        // コンテンツセクションを表示
+        contentSection.style.display = 'block';
+        welcomeName.textContent = window.formData.name;
+        
+        console.log('ページ切り替え完了:', window.formData.name);
+        
+        // コンテンツセクションにスムーズスクロール
+        contentSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
         });
-    </script>
+        
+        // コンテンツセクションを強調表示
+        contentSection.style.boxShadow = '0 0 30px rgba(102, 126, 234, 0.5)';
+        setTimeout(() => {
+            contentSection.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+        }, 2000);
+    } else {
+        console.error('必要な要素が見つかりません');
+    }
+}
+
+// データ管理機能（隠し機能として保持）
+function updateDataCount() {
+    const countDisplay = document.getElementById('count-display');
+    if (countDisplay) {
+        countDisplay.textContent = applicationData.length;
+    }
+}
+
+// 管理者用データアクセス関数（コンソールから実行）
+function showAdminPanel() {
+    const panel = document.getElementById('admin-panel');
+    if (panel) {
+        panel.style.display = 'block';
+        updateDataCount();
+        console.log('管理パネルを表示しました。総データ件数:', applicationData.length);
+    }
+}
+
+// コンソール用データ確認関数
+function getApplicationData() {
+    console.log('=== 申込みデータ一覧 ===');
+    console.log('総件数:', applicationData.length);
+    console.table(applicationData);
+    return applicationData;
+}
+
+// コンソール用CSV出力関数
+function exportCSVFromConsole() {
+    downloadCSV();
+    console.log('CSVファイルをダウンロードしました。');
+}
+
+function downloadCSV() {
+    if (applicationData.length === 0) {
+        alert('ダウンロードするデータがありません。');
+        return;
+    }
+    
+    // CSVヘッダー
+    const headers = ['ID', '申込み日時', '名前', 'メールアドレス', '大学名', '学年', '希望研修科', 'メッセージ'];
+    
+    // CSVデータ作成
+    const csvData = [
+        headers.join(','),
+        ...applicationData.map(data => [
+            data.id,
+            '"' + data.submittedAt + '"',
+            '"' + data.name + '"',
+            '"' + data.email + '"',
+            '"' + data.university + '"',
+            '"' + data.grade + '"',
+            '"' + data.specialty.join('; ') + '"',
+            '"' + (data.message || '') + '"'
+        ].join(','))
+    ].join('\n');
+    
+    // BOMを追加してExcelで正しく表示されるようにする
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csvData], { type: 'text/csv;charset=utf-8;' });
+    
+    // ダウンロード実行
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', '研修医申込みデータ_' + new Date().toISOString().slice(0, 10) + '.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function downloadJSON() {
+    if (applicationData.length === 0) {
+        alert('ダウンロードするデータがありません。');
+        return;
+    }
+    
+    const jsonData = JSON.stringify(applicationData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', '研修医申込みデータ_' + new Date().toISOString().slice(0, 10) + '.json');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function viewApplications() {
+    if (applicationData.length === 0) {
+        alert('表示するデータがありません。');
+        return;
+    }
+    
+    const modal = document.getElementById('data-modal');
+    const content = document.getElementById('data-content');
+    
+    // テーブル作成
+    let tableHTML = '<table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">';
+    tableHTML += '<thead><tr style="background: #f8f9fa;">';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">ID</th>';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">申込み日時</th>';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">名前</th>';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">メール</th>';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">大学</th>';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">学年</th>';
+    tableHTML += '<th style="border: 1px solid #dee2e6; padding: 8px; text-align: left;">希望科</th>';
+    tableHTML += '</tr></thead><tbody>';
+    
+    applicationData.forEach(data => {
+        tableHTML += '<tr>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.id + '</td>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.submittedAt + '</td>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.name + '</td>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.email + '</td>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.university + '</td>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.grade + '</td>';
+        tableHTML += '<td style="border: 1px solid #dee2e6; padding: 8px;">' + data.specialty.join(', ') + '</td>';
+        tableHTML += '</tr>';
+    });
+    
+    tableHTML += '</tbody></table>';
+    content.innerHTML = tableHTML;
+    modal.style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('data-modal').style.display = 'none';
+}
+
+function clearAllData() {
+    if (confirm('すべての申込みデータを削除しますか？\nこの操作は取り消せません。')) {
+        applicationData = [];
+        sessionStorage.removeItem('hospitalApplications');
+        updateDataCount();
+        alert('全データを削除しました。');
+    }
+}
+
+function toggleAdminPanel() {
+    const panel = document.getElementById('admin-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+// フォームの入力時にエラーメッセージを非表示にする
+document.querySelectorAll('input[type="text"], input[type="email"], select, textarea').forEach(input => {
+    input.addEventListener('input', function() {
+        const errorDiv = document.getElementById(this.id + '-error');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+            this.style.borderColor = '#e1e5e9';
+        }
+    });
+});
+
+// チェックボックスの変更時にエラーメッセージを非表示にする
+document.querySelectorAll('input[name="specialty"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const specialtyError = document.getElementById('specialty-error');
+        const checkedBoxes = document.querySelectorAll('input[name="specialty"]:checked');
+        if (checkedBoxes.length > 0) {
+            specialtyError.style.display = 'none';
+        }
+    });
+});
+
+// YouTube iframe エラー検出とフォールバック
+function handleYouTubeError() {
+    console.log('YouTube埋め込みエラーが検出されました');
+    
+    // すべてのYouTube iframeを検査
+    const iframes = document.querySelectorAll('iframe[src*="youtube"]');
+    
+    iframes.forEach((iframe, index) => {
+        iframe.addEventListener('error', function() {
+            console.log('iframe ' + (index + 1) + ' でエラーが発生しました');
+            showFallback(iframe);
+        });
+        
+        // 読み込み完了をチェック
+        iframe.addEventListener('load', function() {
+            console.log('iframe ' + (index + 1) + ' が正常に読み込まれました');
+        });
+    });
+}
+
+function showFallback(iframe) {
+    const container = iframe.parentElement;
+    const videoId = iframe.src.match(/embed\/([^?]+)/);
+    const id = videoId ? videoId[1] : 'unknown';
+    
+    container.innerHTML = '<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #667eea; cursor: pointer; border: 2px dashed #dee2e6;" onclick="window.open(\'https://www.youtube.com/watch?v=' + id + '\', \'_blank\')">' +
+        '<div style="font-size: 3.5em; margin-bottom: 10px;">📺</div>' +
+        '<div style="font-size: 1em; font-weight: bold; margin-bottom: 5px;">動画を視聴</div>' +
+        '<div style="font-size: 0.8em; color: #666; display: flex; align-items: center;">' +
+        '<span style="margin-right: 5px;">▶️</span>YouTubeで開く</div>' +
+        '</div>';
+}
+
+</script>
 </body>
 </html>
