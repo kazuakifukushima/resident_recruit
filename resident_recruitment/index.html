@@ -597,33 +597,6 @@ window.addEventListener('load', function() {
     updateDataCount();
     
     // データを記録（コンソールログ）
-    console.log('==== 研修医申込みデータ ====');
-    console.log('ID:', formData.id);
-    console.log('名前:', formData.name);
-    console.log('メールアドレス:', formData.email);
-    console.log('大学名:', formData.university);
-    console.log('学年:', formData.grade);
-    console.log('希望研修科:', selectedSpecialties);
-    console.log('メッセージ:', formData.message);
-    console.log('申込み日時:', formData.submittedAt);
-    console.log('総申込み件数:', applicationData.length);
-    console.log('========================');
-    
-    // 少し遅延を入れて送信処理をシミュレート
-    setTimeout(() => {
-        // バックグラウンドでのみデータ蓄積（ユーザーには見せない）
-        console.log('データが正常に蓄積されました。総件数:', applicationData.length);
-        
-        // グローバル変数にデータを保存（コンテンツ表示用）
-        window.formData = formData;
-        showContent();
-        
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    }, 800);
-});
-
-}
 
 // データ管理機能（認証付きセキュア版）
 let adminAuthenticated = false;
