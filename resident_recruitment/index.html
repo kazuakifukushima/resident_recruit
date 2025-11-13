@@ -48,8 +48,150 @@
             margin-bottom: 20px;
         }
         
-        .content-section {
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-title {
+            font-size: 1.8em;
+            color: #2c5aa0;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
             display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .specialty-categories {
+            margin-top: 15px;
+        }
+        
+        .specialty-category {
+            margin-bottom: 25px;
+            background: rgba(248, 249, 250, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .category-title {
+            color: #2c5aa0;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            padding-left: 12px;
+        }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .checkbox-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: #667eea;
+            transform: translateY(-1px);
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            transform: scale(1.2);
+            accent-color: #667eea;
+        }
+        
+        .checkbox-item span {
+            font-size: 14px;
+            color: #333;
+            user-select: none;
+        }
+        
+        .checkbox-item:has(input:checked) {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .checkbox-item:has(input:checked) span {
+            color: #2c5aa0;
+            font-weight: 600;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .content-section {
+            display: none;
             animation: fadeIn 0.8s ease;
         }
         
@@ -239,7 +381,7 @@
                 padding: 10px;
             }
             
-            .video-section, .photos-section {
+            .form-container, .video-section, .photos-section {
                 padding: 20px;
             }
             
@@ -276,7 +418,7 @@
         
         <div id="content-section" class="content-section">
             <div class="welcome-message">
-                <h2 style="color: #2c5aa0; margin-bottom: 15px;">ようこそ！</h2>
+                <h2 style="color: #2c5aa0; margin-bottom: 15px;">ようこそ、<span id="welcome-name"></span>さん！</h2>
                 <p style="color: #666; font-size: 1.1em;">
                     当院の研修医に関する特別コンテンツをご用意いたしました。<br>
                     将来の医師としてのキャリアを考える参考にしていただければ幸いです。
@@ -736,7 +878,168 @@ window.addEventListener('load', function() {
     }
 });
 
-// フォーム入力ページは削除され、直接動画閲覧ページが表示されます
+document.getElementById('applicationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    console.log('フォーム送信開始');
+    
+    // ボタンを無効化して重複送信を防止
+    const submitBtn = document.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '📤 送信中...';
+    
+    // バリデーション
+    let isValid = true;
+    const fields = ['name', 'university', 'grade', 'email'];
+    
+    // 通常のフィールドのバリデーション
+    fields.forEach(field => {
+        const input = document.getElementById(field);
+        const errorDiv = document.getElementById(field + '-error');
+        
+        if (!input.value.trim()) {
+            errorDiv.style.display = 'block';
+            input.style.borderColor = '#e74c3c';
+            isValid = false;
+        } else {
+            errorDiv.style.display = 'none';
+            input.style.borderColor = '#e1e5e9';
+        }
+    });
+    
+    // 志望科のバリデーション（チェックボックス）
+    const specialtyCheckboxes = document.querySelectorAll('input[name="specialty"]:checked');
+    const specialtyError = document.getElementById('specialty-error');
+    
+    if (specialtyCheckboxes.length === 0) {
+        specialtyError.style.display = 'block';
+        isValid = false;
+    } else {
+        specialtyError.style.display = 'none';
+    }
+    
+    // メールアドレスの形式チェック
+    const email = document.getElementById('email');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email.value && !emailRegex.test(email.value)) {
+        document.getElementById('email-error').style.display = 'block';
+        document.getElementById('email-error').textContent = '正しいメールアドレスを入力してください';
+        email.style.borderColor = '#e74c3c';
+        isValid = false;
+    }
+    
+    if (!isValid) {
+        // バリデーションエラーの場合はボタンを復旧
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        
+        // エラーがある場合は最初のエラー要素にスクロール
+        const firstError = document.querySelector('.error-message[style*="block"]');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    }
+    
+    // 選択された志望科を配列として取得
+    const selectedSpecialties = Array.from(specialtyCheckboxes).map(checkbox => checkbox.value);
+    
+    // フォームデータを準備
+    const formData = {
+        id: Date.now(), // 一意のID
+        name: document.getElementById('name').value,
+        university: document.getElementById('university').value,
+        grade: document.getElementById('grade').value,
+        email: document.getElementById('email').value,
+        specialty: selectedSpecialties,
+        message: document.getElementById('message').value,
+        submittedAt: new Date().toLocaleString('ja-JP')
+    };
+    
+    console.log('フォームデータ:', formData);
+    
+    // データを配列に追加
+    applicationData.push(formData);
+    
+    // Google Sheetsに送信（バックグラウンド）
+    sendToGoogleSheets(formData).then(success => {
+        if (success) {
+            console.log('📊 申込みデータをGoogle Sheetsに保存しました');
+        } else {
+            console.warn('⚠️ Google Sheets保存に失敗しましたが、ローカルには保存されています');
+        }
+    });
+    
+    // セッションストレージに保存（ブラウザを閉じるまで保持）
+    try {
+        sessionStorage.setItem('hospitalApplications', JSON.stringify(applicationData));
+    } catch (e) {
+        console.error('データの保存に失敗しました:', e);
+    }
+    
+    // データ件数を更新
+    updateDataCount();
+    
+    // データを記録（コンソールログ）
+    console.log('==== 研修医申込みデータ ====');
+    console.log('ID:', formData.id);
+    console.log('名前:', formData.name);
+    console.log('メールアドレス:', formData.email);
+    console.log('大学名:', formData.university);
+    console.log('学年:', formData.grade);
+    console.log('希望研修科:', selectedSpecialties);
+    console.log('メッセージ:', formData.message);
+    console.log('申込み日時:', formData.submittedAt);
+    console.log('総申込み件数:', applicationData.length);
+    console.log('========================');
+    
+    // 少し遅延を入れて送信処理をシミュレート
+    setTimeout(() => {
+        // バックグラウンドでのみデータ蓄積（ユーザーには見せない）
+        console.log('データが正常に蓄積されました。総件数:', applicationData.length);
+        
+        // グローバル変数にデータを保存（コンテンツ表示用）
+        window.formData = formData;
+        showContent();
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+    }, 800);
+});
+
+function showContent() {
+    console.log('showContent関数が呼ばれました');
+    
+    const formContainer = document.getElementById('registration-form');
+    const contentSection = document.getElementById('content-section');
+    const welcomeName = document.getElementById('welcome-name');
+    
+    if (formContainer && contentSection && welcomeName) {
+        // フォームセクション全体を非表示
+        formContainer.style.display = 'none';
+        
+        // コンテンツセクションを表示
+        contentSection.style.display = 'block';
+        welcomeName.textContent = window.formData.name;
+        
+        console.log('ページ切り替え完了:', window.formData.name);
+        
+        // コンテンツセクションにスムーズスクロール
+        contentSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+        
+        // コンテンツセクションを強調表示
+        contentSection.style.boxShadow = '0 0 30px rgba(102, 126, 234, 0.5)';
+        setTimeout(() => {
+            contentSection.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+        }, 2000);
+    } else {
+        console.error('必要な要素が見つかりません');
+    }
+}
 
 // データ管理機能（認証付きセキュア版）
 let adminAuthenticated = false;
@@ -1164,7 +1467,27 @@ function toggleAdminPanel() {
     return true;
 }
 
-// フォーム入力ページは削除されました
+// フォームの入力時にエラーメッセージを非表示にする
+document.querySelectorAll('input[type="text"], input[type="email"], select, textarea').forEach(input => {
+    input.addEventListener('input', function() {
+        const errorDiv = document.getElementById(this.id + '-error');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+            this.style.borderColor = '#e1e5e9';
+        }
+    });
+});
+
+// チェックボックスの変更時にエラーメッセージを非表示にする
+document.querySelectorAll('input[name="specialty"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const specialtyError = document.getElementById('specialty-error');
+        const checkedBoxes = document.querySelectorAll('input[name="specialty"]:checked');
+        if (checkedBoxes.length > 0) {
+            specialtyError.style.display = 'none';
+        }
+    });
+});
 
 // YouTube iframe エラー検出とフォールバック
 function handleYouTubeError() {
