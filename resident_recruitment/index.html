@@ -49,7 +49,7 @@
         }
         
         .content-section {
-            display: none;
+            display: block;
             animation: fadeIn 0.8s ease;
         }
         
@@ -822,22 +822,6 @@ window.addEventListener('load', function() {
     console.log('申込み日時:', formData.submittedAt);
     console.log('総申込み件数:', applicationData.length);
     console.log('========================');
-    
-    // 少し遅延を入れて送信処理をシミュレート
-    setTimeout(() => {
-        // バックグラウンドでのみデータ蓄積（ユーザーには見せない）
-        console.log('データが正常に蓄積されました。総件数:', applicationData.length);
-        
-        // グローバル変数にデータを保存（コンテンツ表示用）
-        window.formData = formData;
-        showContent();
-        
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalText;
-    }, 800);
-});
-
-}
 
 // データ管理機能（認証付きセキュア版）
 let adminAuthenticated = false;
